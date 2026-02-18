@@ -36,3 +36,38 @@ coverage.html
 ralph/
 .ralph/
 tasks/
+
+# Local env overrides
+.env.local
+
+# Android / APK build artifacts
+android/
+*.apk
+*.tar.gz
+build-android.sh
+setup-environment.bat
+setup-environment.ps1
+ANDROID_PROJECT_SUMMARY.md
+Android-APK-PRD.md
+
+# Temp files and dirs
+tmp/
+tmp-emulator/
+tmp-pixel/
+tmp_config.json
+tmp-pico-gateway-once.log
+tmp-*.xml
+nul
+
+# Status/delivery report docs
+BUILD_STATUS_REPORT.md
+INSTALLATION_COMPLETE.md
+INSTALLATION_STATUS.md
+PROJECT_DELIVERY_SUMMARY.md
+
+# Credentials & service account keys
+*-[0-9a-f]*.json
+leadgrown-*.json
+
+# Scripts
+upload-to-drive.py
