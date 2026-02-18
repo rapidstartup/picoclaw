@@ -52,6 +52,22 @@ func (p *HTTPProvider) Chat(ctx context.Context, messages []Message, tools []Too
 		return nil, fmt.Errorf("API base not configured")
 	}
 
+	// If we're talking to OpenRouter, normalize model names:
+	// - Allow "openrouter/<vendor>/<model>" configs by stripping the "openrouter/" prefix.
+	// - If the model has no vendor prefix, map common ones to OpenRouter's vendor/model naming.
+	if strings.Contains(p.apiBase, "openrouter.ai") {
+		model = strings.TrimPrefix(model, "openrouter/")
+		if !strings.Contains(model, "/") {
+			lower := strings.ToLower(model)
+			switch {
+			case strings.Contains(lower, "gemini"):
+				model = "google/" + model
+			case strings.HasPrefix(lower, "glm"):
+				model = "zhipu/" + model
+			}
+		}
+	}
+
 	// Strip provider prefix from model name (e.g., moonshot/kimi-k2.5 -> kimi-k2.5)
 	if idx := strings.Index(model, "/"); idx != -1 {
 		prefix := model[:idx]

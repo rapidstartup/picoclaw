@@ -208,8 +208,10 @@ func DefaultConfig() *Config {
 			Defaults: AgentDefaults{
 				Workspace:           "~/.picoclaw/workspace",
 				RestrictToWorkspace: true,
-				Provider:            "",
-				Model:               "glm-4.7",
+				// Default to direct Gemini when configured; CreateProvider() will fall back to
+				// OpenRouter automatically if Gemini isn't configured.
+				Provider:            "gemini",
+				Model:               "gemini-2.5-flash",
 				MaxTokens:           8192,
 				Temperature:         0.7,
 				MaxToolIterations:   20,
@@ -332,7 +334,30 @@ func LoadConfig(path string) (*Config, error) {
 		return nil, err
 	}
 
+	// Backward-compatible env var aliases (common .env naming).
+	// The primary supported env vars remain the PICOCLAW_* ones from struct tags.
+	applyEnvAliases(cfg)
+
 	return cfg, nil
+}
+
+func applyEnvAliases(cfg *Config) {
+	// Provider keys
+	if cfg.Providers.OpenRouter.APIKey == "" {
+		cfg.Providers.OpenRouter.APIKey = os.Getenv("OPENROUTER_API_KEY")
+	}
+	if cfg.Providers.OpenAI.APIKey == "" {
+		cfg.Providers.OpenAI.APIKey = os.Getenv("OPENAI_API_KEY")
+	}
+	if cfg.Providers.Gemini.APIKey == "" {
+		cfg.Providers.Gemini.APIKey = os.Getenv("GEMINI_API_KEY")
+	}
+	if cfg.Providers.Zhipu.APIKey == "" {
+		cfg.Providers.Zhipu.APIKey = os.Getenv("ZHIPU_API_KEY")
+	}
+	if cfg.Providers.Anthropic.APIKey == "" {
+		cfg.Providers.Anthropic.APIKey = os.Getenv("ANTHROPIC_API_KEY")
+	}
 }
 
 func SaveConfig(path string, cfg *Config) error {
